@@ -48,8 +48,6 @@ func (p *Policy) Evict() uint64 {
 
 func bitLookup(num uint64) uint64 {
 	switch num {
-	case 0:
-		return 0
 	case 1:
 		return 0
 	case 2:
@@ -178,9 +176,6 @@ func bitLookup(num uint64) uint64 {
 		return 62
 	case 9223372036854775808:
 		return 63
-	case 18446744073709551615:
-		return 64
 	}
 	panic("invalid bit lookup")
-	return 0
 }

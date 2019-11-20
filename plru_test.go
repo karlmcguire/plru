@@ -45,52 +45,49 @@ func TestClear(t *testing.T) {
 
 func TestEvict(t *testing.T) {
 	p := NewPolicy(128)
-	for i := 0; i < 100; i++ {
-		p.Hit(rand.Uint64() % 128)
-	}
-	for i := 0; i < 32; i++ {
-		if p.Has(p.Evict()) {
-			t.Fatal("Evict returning invalid block")
+	for i := 0; i < 128; i++ {
+		victim := p.Evict()
+		if p.Has(victim) {
+			t.Fatal("Evict returning used block")
 		}
+		p.Hit(p.Evict())
 	}
+	defer func() {
+		if r := recover(); r == nil {
+			t.Fatal("bitLookup should panic")
+		}
+	}()
+	bitLookup(3)
 }
 
 func BenchmarkHas(b *testing.B) {
-	p := NewPolicy(64)
 	b.SetBytes(1)
-	b.RunParallel(func(pb *testing.PB) {
-		for pb.Next() {
-			p.Has(0)
-		}
-	})
+	p := NewPolicy(64)
+	for n := 0; n < b.N; n++ {
+		p.Has(1)
+	}
 }
 
 func BenchmarkHit(b *testing.B) {
-	p := NewPolicy(64)
 	b.SetBytes(1)
-	b.RunParallel(func(pb *testing.PB) {
-		for pb.Next() {
-			p.Hit(1)
-		}
-	})
+	p := NewPolicy(64)
+	for n := 0; n < b.N; n++ {
+		p.Hit(1)
+	}
 }
 
 func BenchmarkClear(b *testing.B) {
-	p := NewPolicy(64)
 	b.SetBytes(1)
-	b.RunParallel(func(pb *testing.PB) {
-		for pb.Next() {
-			p.Clear(1)
-		}
-	})
+	p := NewPolicy(64)
+	for n := 0; n < b.N; n++ {
+		p.Clear(1)
+	}
 }
 
 func BenchmarkEvict(b *testing.B) {
-	p := NewPolicy(64)
 	b.SetBytes(1)
-	b.RunParallel(func(pb *testing.PB) {
-		for pb.Next() {
-			p.Evict()
-		}
-	})
+	p := NewPolicy(64)
+	for n := 0; n < b.N; n++ {
+		p.Evict()
+	}
 }

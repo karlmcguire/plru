@@ -1,7 +1,7 @@
 # plru
 
 Pseudo-LRU implementation using 1-bit per entry and achieving hit ratios within
-1-4% of full LRU. This method is commonly refered to as "PLRUm" because each bit
+1-2% of full LRU. This method is commonly refered to as "PLRUm" because each bit
 serves as a MRU flag for each cache entry.
 
 Academic literature where PLRUm is mentioned:

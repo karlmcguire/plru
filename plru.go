@@ -2,7 +2,6 @@ package plru
 
 import (
 	"math"
-	_ "unsafe"
 )
 
 const (
@@ -185,6 +184,3 @@ func bitLookup(num uint64) uint64 {
 	panic("invalid bit lookup")
 	return 0
 }
-
-//go:linkname random runtime.fastrand
-func random() uint32

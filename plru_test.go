@@ -1,7 +1,6 @@
 package plru
 
 import (
-	"fmt"
 	"math/rand"
 	"testing"
 	"time"
@@ -46,14 +45,6 @@ func TestClear(t *testing.T) {
 
 func TestEvict(t *testing.T) {
 	p := NewPolicy(128)
-	for i := 0; i < 256; i++ {
-		vic := p.Evict()
-		p.Hit(vic)
-		fmt.Println(vic)
-		if vic == 128 {
-			t.Fatal("bad Evict")
-		}
-	}
 	for i := 0; i < 100; i++ {
 		p.Hit(rand.Uint64() % 128)
 	}

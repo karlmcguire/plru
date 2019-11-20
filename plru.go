@@ -41,7 +41,7 @@ func (p *Policy) Clear(bit uint64) {
 func (p *Policy) Evict() uint64 {
 	index := p.counter
 	block := &p.blocks[index]
-	if p.counter++; p.counter == uint64(len(p.blocks)) {
+	if p.counter++; p.counter >= uint64(len(p.blocks)) {
 		p.counter = 0
 	}
 	return (index * blockSize) + bitLookup(^*block&(*block+1))

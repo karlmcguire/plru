@@ -19,7 +19,7 @@ type Policy struct {
 }
 
 // NewPolicy returns an empty Policy where size is the number of entries to
-// track. The size param is rounded up to the next power of 64.
+// track. The size param is rounded up to the next multiple of 64.
 func NewPolicy(size uint64) *Policy {
 	size = ((size + 32) >> 6) << 6
 	return &Policy{

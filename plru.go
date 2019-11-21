@@ -33,7 +33,7 @@ func (p *Policy) Hit(bit uint64) {
 	}
 }
 
-func (p *Policy) Clear(bit uint64) {
+func (p *Policy) Del(bit uint64) {
 	p.blocks[bit/blockSize] &= 0 << (bit & blockMask)
 }
 

@@ -34,10 +34,10 @@ func TestHit(t *testing.T) {
 	}
 }
 
-func TestClear(t *testing.T) {
+func TestDel(t *testing.T) {
 	p := NewPolicy(64)
 	p.Hit(1)
-	p.Clear(1)
+	p.Del(1)
 	if p.blocks[0] != 0 {
 		t.Fatal("Clear not working")
 	}
@@ -80,7 +80,7 @@ func BenchmarkClear(b *testing.B) {
 	b.SetBytes(1)
 	p := NewPolicy(64)
 	for n := 0; n < b.N; n++ {
-		p.Clear(1)
+		p.Del(1)
 	}
 }
 

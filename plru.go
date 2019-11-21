@@ -1,3 +1,5 @@
+// A Pseudo-LRU implementation using 1-bit per entry and hit ratio performance
+// nearly identical to full LRU.
 package plru
 
 import (
@@ -10,21 +12,28 @@ const (
 	blockFull = math.MaxUint64
 )
 
+// Policy is the
 type Policy struct {
 	blocks  []uint64
 	counter uint64
 }
 
+// NewPolicy returns an empty Policy where size is the number of entries to
+// track. The size param is rounded up to the next power of 64.
 func NewPolicy(size uint64) *Policy {
+	size = ((size + 32) >> 6) << 6
 	return &Policy{
 		blocks: make([]uint64, (size+blockMask)/blockSize),
 	}
 }
 
+// Has returns true if the bit is set (1) and false if not (0).
 func (p *Policy) Has(bit uint64) bool {
 	return (p.blocks[bit/blockSize] & (1 << (bit & blockMask))) > 0
 }
 
+// Hit sets the bit to 1 and clears the other bits in the block if capacity is
+// reached.
 func (p *Policy) Hit(bit uint64) {
 	block := &p.blocks[bit/blockSize]
 	*block |= 1 << (bit & blockMask)
@@ -33,10 +42,12 @@ func (p *Policy) Hit(bit uint64) {
 	}
 }
 
+// Del sets the bit to 0.
 func (p *Policy) Del(bit uint64) {
 	p.blocks[bit/blockSize] &= 0 << (bit & blockMask)
 }
 
+// Evict returns a LRU bit that you can later pass to Hit.
 func (p *Policy) Evict() uint64 {
 	index := p.counter
 	block := &p.blocks[index]

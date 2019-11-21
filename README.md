@@ -4,8 +4,9 @@
 [![Coverage](https://img.shields.io/badge/coverage-100%25-ff69b4.svg)](https://gocover.io/karlmcguire/plru)
 
 Pseudo-LRU implementation using 1-bit per entry and achieving hit ratios within
-1-2% of full LRU. This method is commonly refered to as "PLRUm" because each bit
-serves as a MRU flag for each cache entry.
+1-2% of Full-LRU (using expensive doubly-linked lists). This algorithm is 
+commonly refered to as "PLRUm" because each bit serves as a MRU flag for each 
+cache entry.
 
 Academic literature where PLRUm is mentioned:
 

@@ -37,9 +37,13 @@ func TestHit(t *testing.T) {
 func TestDel(t *testing.T) {
 	p := NewPolicy(64)
 	p.Hit(1)
+	p.Hit(2)
 	p.Del(1)
-	if p.blocks[0] != 0 {
+	if p.Has(1) {
 		t.Fatal("Clear not working")
+	}
+	if !p.Has(2) {
+		t.Fatal("Clear other bit")
 	}
 }
 

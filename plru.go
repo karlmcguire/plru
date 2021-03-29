@@ -44,7 +44,7 @@ func (p *Policy) Hit(bit uint64) {
 
 // Del sets the bit to 0.
 func (p *Policy) Del(bit uint64) {
-	p.blocks[bit/blockSize] &= 0 << (bit & blockMask)
+	p.blocks[bit/blockSize] &^= 1 << (bit & blockMask)
 }
 
 // Evict returns a LRU bit that you can later pass to Hit.

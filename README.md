@@ -54,7 +54,7 @@ selecting which block to evict from (performs better than random selection).
 Before being populated, each block is 0.
 
 <p align="center">
-    <img src="https://karlmcguire.com/images/plru_1.svg">
+    <img src="/img/plru_1.svg">
 </p>
 
 ## 2. adding items
@@ -65,7 +65,7 @@ because of the recent access.
 After adding items A, B, C, D, E, F, and G, the PLRUm state looks like this:
 
 <p align="center">
-    <img src="https://karlmcguire.com/images/plru_2.svg">
+    <img src="/img/plru_2.svg">
 </p>
 
 ## 3. reaching capacity
@@ -77,7 +77,7 @@ except the newest are set to 0 when capacity is reached.
 After adding item H, the PLRUm state looks like this:
 
 <p align="center">
-    <img src="https://karlmcguire.com/images/plru_3.svg">
+    <img src="/img/plru_3.svg">
 </p>
 
 ## 4. hit
@@ -87,7 +87,7 @@ A hit just sets the bit to 1.
 After hitting item D, the PLRUm state looks like this:
 
 <p align="center">
-    <img src="https://karlmcguire.com/images/plru_5.svg">
+    <img src="/img/plru_5.svg">
 </p>
 
 ## 5. eviction
@@ -97,5 +97,5 @@ The eviction process returns the location of the first 0 bit found.
 After eviction and adding item I, the PLRUm state looks like this:
 
 <p align="center">
-    <img src="https://karlmcguire.com/images/plru_6.svg">
+    <img src="/img/plru_6.svg">
 </p>

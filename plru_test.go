@@ -58,10 +58,10 @@ func TestEvict(t *testing.T) {
 	}
 	defer func() {
 		if r := recover(); r == nil {
-			t.Fatal("bitLookup should panic")
+			t.Fatal("lookup should panic")
 		}
 	}()
-	bitLookup(3)
+	lookup(3)
 }
 
 func BenchmarkHas(b *testing.B) {

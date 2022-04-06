@@ -54,7 +54,7 @@ func (p *Policy) Del(bit uint64) {
 	block := &p.blocks[bit/bSize]
 del:
 	o := atomic.LoadUint32(block)
-	n := o & 0 << (bit & bMask)
+	n := o & ^(1 << (bit & bMask))
 	if !atomic.CompareAndSwapUint32(block, o, n) {
 		goto del
 	}

@@ -38,46 +38,37 @@ func (p *Policy) Has(bit uint64) bool {
 // reached.
 func (p *Policy) Hit(bit uint64) {
 	block := &p.blocks[bit/bSize]
-
+hit:
 	o := atomic.LoadUint32(block)
 	n := o | 1<<(bit&bMask)
 	if n == bFull {
 		n = 0 | 1<<(bit&bMask)
 	}
-
-	for !atomic.CompareAndSwapUint32(block, o, n) {
+	if !atomic.CompareAndSwapUint32(block, o, n) {
+		goto hit
 	}
 }
 
 // Del sets the bit to 0.
 func (p *Policy) Del(bit uint64) {
 	block := &p.blocks[bit/bSize]
-
+del:
 	o := atomic.LoadUint32(block)
 	n := o & 0 << (bit & bMask)
-
-	for !atomic.CompareAndSwapUint32(block, o, n) {
+	if !atomic.CompareAndSwapUint32(block, o, n) {
+		goto del
 	}
 }
 
 // Evict returns a LRU bit that you can later pass to Hit.
 func (p *Policy) Evict() uint64 {
-	i := atomic.AddUint64(&p.cursor, 1) - 1
-	block := &p.blocks[i%p.size]
-	return ((i % p.size) * bSize) + bitLookup(^*block&(*block+1))
-
-	/*
-		index := p.cursor
-		block := &p.blocks[index]
-		if p.cursor++; p.cursor >= uint64(len(p.blocks)) {
-			p.cursor = 0
-		}
-		return (index * bSize) + bitLookup(^*block&(*block+1))
-	*/
+	i := (atomic.AddUint64(&p.cursor, 1) - 1) % p.size
+	block := atomic.LoadUint32(&p.blocks[i])
+	return (i * bSize) + lookup(^block&(block+1))
 }
 
-func bitLookup(num uint32) uint64 {
-	switch num {
+func lookup(b uint32) uint64 {
+	switch b {
 	case 1:
 		return 0
 	case 2:

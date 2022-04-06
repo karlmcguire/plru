@@ -1,33 +1,15 @@
 package plru
 
 import (
-	"fmt"
 	"math/rand"
 	"testing"
 	"time"
-
-	"github.com/davecgh/go-spew/spew"
 )
 
 func init() {
 	rand.Seed(time.Now().Unix())
 }
 
-func TestMisc(t *testing.T) {
-	p := NewPolicy(64)
-	spew.Dump(p)
-
-	p.Hit(20)
-	fmt.Println(p.Has(20))
-
-	fmt.Println(p.Evict())
-	fmt.Println(p.Evict())
-	fmt.Println(p.Evict())
-	fmt.Println(p.Evict())
-	fmt.Println(p.Evict())
-}
-
-/*
 func TestHas(t *testing.T) {
 	p := NewPolicy(128)
 	p.Hit(1)
@@ -72,10 +54,10 @@ func TestEvict(t *testing.T) {
 	}
 	defer func() {
 		if r := recover(); r == nil {
-			t.Fatal("bitLookup should panic")
+			t.Fatal("lookup should panic")
 		}
 	}()
-	bitLookup(3)
+	lookup(3)
 }
 
 func BenchmarkHas(b *testing.B) {
@@ -109,4 +91,3 @@ func BenchmarkEvict(b *testing.B) {
 		p.Evict()
 	}
 }
-*/

@@ -4,6 +4,8 @@ import (
 	"math/rand"
 	"testing"
 	"time"
+
+	gen "github.com/pingcap/go-ycsb/pkg/generator"
 )
 
 func init() {
@@ -20,7 +22,7 @@ func TestHas(t *testing.T) {
 }
 
 func TestHit(t *testing.T) {
-	p := NewPolicy(128)
+	p := NewPolicy(129)
 	if p.Has(0) {
 		t.Fatal("Has not working")
 	}
@@ -64,34 +66,92 @@ func TestEvict(t *testing.T) {
 	lookup(3)
 }
 
-func BenchmarkHas(b *testing.B) {
-	b.SetBytes(1)
-	p := NewPolicy(64)
-	for n := 0; n < b.N; n++ {
-		p.Has(1)
+const (
+	benchPolicySize = 1e6
+)
+
+func benchAccess() (bits [benchPolicySize]uint64) {
+	z := gen.NewScrambledZipfian(0, benchPolicySize-1, gen.ZipfianConstant)
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	for i := 0; i < benchPolicySize; i++ {
+		bits[i] = uint64(z.Next(r))
 	}
+	return
+}
+
+func BenchmarkHas(b *testing.B) {
+	a := benchAccess()
+	b.Run("single", func(b *testing.B) {
+		b.SetBytes(1)
+		p := NewPolicy(benchPolicySize)
+		for n := 0; n < b.N; n++ {
+			p.Has(a[n%benchPolicySize])
+		}
+	})
+	b.Run("concurrent", func(b *testing.B) {
+		b.SetBytes(1)
+		p := NewPolicy(benchPolicySize)
+		b.RunParallel(func(pb *testing.PB) {
+			for n := 0; pb.Next(); n++ {
+				p.Has(a[n%benchPolicySize])
+			}
+		})
+	})
 }
 
 func BenchmarkHit(b *testing.B) {
-	b.SetBytes(1)
-	p := NewPolicy(64)
-	for n := 0; n < b.N; n++ {
-		p.Hit(1)
-	}
+	b.Run("single", func(b *testing.B) {
+		b.SetBytes(1)
+		p := NewPolicy(benchPolicySize)
+		for n := 0; n < b.N; n++ {
+			p.Hit(1)
+		}
+	})
+	b.Run("concurrent", func(b *testing.B) {
+		b.SetBytes(1)
+		p := NewPolicy(benchPolicySize)
+		b.RunParallel(func(pb *testing.PB) {
+			for pb.Next() {
+				p.Hit(1)
+			}
+		})
+	})
 }
 
 func BenchmarkClear(b *testing.B) {
-	b.SetBytes(1)
-	p := NewPolicy(64)
-	for n := 0; n < b.N; n++ {
-		p.Del(1)
-	}
+	b.Run("single", func(b *testing.B) {
+		b.SetBytes(1)
+		p := NewPolicy(benchPolicySize)
+		for n := 0; n < b.N; n++ {
+			p.Del(1)
+		}
+	})
+	b.Run("concurrent", func(b *testing.B) {
+		b.SetBytes(1)
+		p := NewPolicy(benchPolicySize)
+		b.RunParallel(func(pb *testing.PB) {
+			for pb.Next() {
+				p.Del(1)
+			}
+		})
+	})
 }
 
 func BenchmarkEvict(b *testing.B) {
-	b.SetBytes(1)
-	p := NewPolicy(64)
-	for n := 0; n < b.N; n++ {
-		p.Evict()
-	}
+	b.Run("single", func(b *testing.B) {
+		b.SetBytes(1)
+		p := NewPolicy(benchPolicySize)
+		for n := 0; n < b.N; n++ {
+			p.Evict()
+		}
+	})
+	b.Run("concurrent", func(b *testing.B) {
+		b.SetBytes(1)
+		p := NewPolicy(benchPolicySize)
+		b.RunParallel(func(pb *testing.PB) {
+			for pb.Next() {
+				p.Evict()
+			}
+		})
+	})
 }

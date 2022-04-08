@@ -22,21 +22,31 @@ type Policy struct {
 // NewPolicy returns an empty Policy where size is the number of entries to
 // track. The size param is rounded up to the next multiple of 32.
 func NewPolicy(size uint64) *Policy {
-	size = ((size + 32) >> 5) << 5
+	size = uint64(int64(size+bMask) & int64(-bSize))
 	return &Policy{
-		blocks: make([]uint32, (size+bMask)/bSize),
-		size:   ((size + bMask) / bSize),
+		blocks: make([]uint32, size/bSize),
+		size:   size,
 	}
+}
+
+func (p *Policy) Size() uint64 {
+	return p.size
 }
 
 // Has returns true if the bit is set (1) and false if not (0).
 func (p *Policy) Has(bit uint64) bool {
+	if bit > p.size {
+		return false
+	}
 	return (atomic.LoadUint32(&p.blocks[bit/bSize]) & (1 << (bit & bMask))) > 0
 }
 
 // Hit sets the bit to 1 and clears the other bits in the block if capacity is
 // reached.
 func (p *Policy) Hit(bit uint64) {
+	if bit > p.size {
+		return
+	}
 	block := &p.blocks[bit/bSize]
 hit:
 	o := atomic.LoadUint32(block)
@@ -51,6 +61,9 @@ hit:
 
 // Del sets the bit to 0.
 func (p *Policy) Del(bit uint64) {
+	if bit > p.size {
+		return
+	}
 	block := &p.blocks[bit/bSize]
 del:
 	o := atomic.LoadUint32(block)
@@ -62,7 +75,7 @@ del:
 
 // Evict returns a LRU bit that you can later pass to Hit.
 func (p *Policy) Evict() uint64 {
-	i := (atomic.AddUint64(&p.cursor, 1) - 1) % p.size
+	i := (atomic.AddUint64(&p.cursor, 1) - 1) % uint64(len(p.blocks))
 	block := atomic.LoadUint32(&p.blocks[i])
 	return (i * bSize) + lookup(^block&(block+1))
 }

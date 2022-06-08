@@ -3,6 +3,7 @@
 package plru
 
 import (
+	"fmt"
 	"math"
 	"sync/atomic"
 )
@@ -67,7 +68,10 @@ func (p *Policy) Del(bit uint64) {
 	block := &p.blocks[bit/bSize]
 del:
 	o := atomic.LoadUint32(block)
+	fmt.Printf("%032b\n", o)
 	n := o & ^(1 << (bit & bMask))
+	fmt.Printf("%032b\n", o & ^(1<<(bit&bMask)))
+	fmt.Printf("%032b\n", n)
 	if !atomic.CompareAndSwapUint32(block, o, n) {
 		goto del
 	}
